@@ -1,8 +1,8 @@
 <template>
-  <section class="row">
+  <section class="row" :class="status">
     <div>{{ name }}</div>
     <div class="center">{{ quantity }}</div>
-    <div class="center">{{ price }}</div>
+    <div class="center">{{ price | currency }}</div>
     <div class="center">
       <button class="button" @click="add(id)">в корзину</button>
     </div>
@@ -11,8 +11,17 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import { mapActions } from 'vuex'
 
 export default Vue.extend({
+  filters: {
+    currency: (value: number) => value.toFixed(2)
+  },
+  data() {
+    return {
+      status: ''
+    }
+  },
   props: {
     id: {
       type: Number,
@@ -32,10 +41,19 @@ export default Vue.extend({
     },
   },
   methods: {
-    add(id: number) {
-      this.$store.commit('cart/add', id)
-    },
+    ...mapActions({
+      add: 'cart/add',
+    }),
   },
+  watch: {
+    price: function(prev: number, curr: number) {
+      if (curr > prev) {
+        this.status = 'up'
+      } else {
+        this.status = 'down'
+      }
+    }
+  }
 })
 </script>
 
@@ -69,5 +87,13 @@ export default Vue.extend({
 
 .button:active {
   background-color: #ddd;
+}
+
+.up {
+  color: green;
+}
+
+.down {
+  color: red;
 }
 </style>

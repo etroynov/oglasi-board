@@ -35,14 +35,24 @@ import Cart from '../components/Cart.vue'
 import Spoiler from '../components/Spoiler.vue'
 import Product from '../components/Product.vue'
 
-import {
-  getCategories,
-  getProducts,
-  getProductsMetaObjToHash,
-  getProductsWithMeta,
-} from '../utils'
-
 export default Vue.extend({
+  data(): {
+    interval: NodeJS.Timeout
+  } {
+    return {
+      interval: '' as any,
+    }
+  },
+  methods: {
+    start() {
+      this.interval = setInterval(() => {
+        this.$store.dispatch('fetch');
+      }, 3 * 1000)
+    },
+    stop() {
+      clearInterval(this.interval)
+    },
+  },
   components: {
     Cart,
     Product,
@@ -69,24 +79,10 @@ export default Vue.extend({
     },
   },
   async mounted() {
-    try {
-      const [{ data: meta }, { data: groups }] = await Promise.all([
-        this.$axios.get('/meta.json'),
-        this.$axios.get('/groups.json'),
-      ])
-
-      const categories = getCategories(groups)
-      const products = getProducts(groups)
-      const metaHash = getProductsMetaObjToHash(meta)
-
-      const productsWithMeta = getProductsWithMeta(products, metaHash)
-
-      this.$store.commit('categories/fetch', categories)
-      this.$store.commit('products/fetch', productsWithMeta)
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e, 'test')
-    }
+    this.$store.dispatch('fetch').then(this.start)
+  },
+  beforeDestroy() {
+    this.stop()
   },
 })
 </script>

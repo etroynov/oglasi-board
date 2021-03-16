@@ -5,7 +5,7 @@ import { ProductMetaListSource, ProductsMetaHash } from '../typings'
  *
  * @param {Array} values
  */
-export const getProductsMetaObjToHash = (values: any[]): ProductsMetaHash => {
+export const getProductsMetaObjToHash = (values: any[], rate: number): ProductsMetaHash => {
   const hash: ProductsMetaHash = {}
 
   values.forEach((value) => {
@@ -13,7 +13,7 @@ export const getProductsMetaObjToHash = (values: any[]): ProductsMetaHash => {
       value
     ).reverse() as ProductMetaListSource
 
-    hash[id] = [id, groupId, quantity, price]
+    hash[id] = [id, groupId, quantity, price * rate]
   })
 
   return hash
