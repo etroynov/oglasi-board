@@ -48,33 +48,34 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { mapMutations } from 'vuex'
+import { defineComponent, computed } from '@nuxtjs/composition-api'
+import { createNamespacedHelpers } from 'vuex-composition-helpers'
+
+const { useState } = createNamespacedHelpers('cart')
 
 import CartProduct from '../components/CartProduct.vue'
 
 import type { CartProductType } from '../typings'
 
-export default Vue.extend({
+export default defineComponent({
   components: {
     CartProduct,
   },
-  computed: {
-    totalPrice(): number {
-      const price = this.items.reduce(
-        (acc: number, product: CartProductType) => {
-          acc += product.price * product.count
+  setup() {
+    const { data: items } = useState(['data'])
 
-          return acc
-        },
-        0
-      )
+    const totalPrice = computed(() =>
+      items.value.reduce((acc: number, product: CartProductType) => {
+        acc += product.price * product.count
 
-      return price
-    },
-    items(): CartProductType[] {
-      return this.$store.state.cart.data
-    },
+        return acc
+      }, 0)
+    )
+
+    return {
+      items,
+      totalPrice
+    }
   },
 })
 </script>

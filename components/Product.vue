@@ -10,18 +10,12 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { mapActions } from 'vuex'
+import { ref, defineComponent, watch } from '@nuxtjs/composition-api';
+import { createNamespacedHelpers } from 'vuex-composition-helpers'
 
-export default Vue.extend({
-  filters: {
-    currency: (value: number) => value.toFixed(2)
-  },
-  data() {
-    return {
-      status: ''
-    }
-  },
+const { useActions } = createNamespacedHelpers('cart');
+
+export default defineComponent({
   props: {
     id: {
       type: Number,
@@ -40,20 +34,26 @@ export default Vue.extend({
       default: 0,
     },
   },
-  methods: {
-    ...mapActions({
-      add: 'cart/add',
-    }),
+  filters: {
+    currency: (value: number) => value.toFixed(2)
   },
-  watch: {
-    price: function(prev: number, curr: number) {
-      if (curr > prev) {
-        this.status = 'up'
+  setup(props) {
+    const status = ref('')
+    const { add } = useActions(['add'])
+
+    watch(() => props.price, (first: number, second: number) => {
+      if (first > second) {
+        status.value = 'up'
       } else {
-        this.status = 'down'
+        status.value = 'down'
       }
+    })
+
+    return {
+      status,
+      add
     }
-  }
+  },
 })
 </script>
 

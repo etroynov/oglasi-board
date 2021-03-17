@@ -1,23 +1,26 @@
 <template>
-<tr>
-  <td width="300">{{ name }}</td>
-  <td width="50">
-    <input v-model="_count" />
-    <p class="error" v-show="_count >= quantity">Количество ограничено</p>
-  </td>
-  <td>{{ price | currency }} <strong>руб</strong>/шт</td>
-  <td><button @click="remove(id)">удалить</button></td>
-</tr>
+  <tr>
+    <td width="300">{{ name }}</td>
+    <td width="50">
+      <input v-model="_count" />
+      <p class="error" v-show="_count>= quantity">
+        Количество ограничено
+      </p>
+    </td>
+    <td>{{ price | currency }} <strong>руб</strong>/шт</td>
+    <td><button @click="remove(id)">удалить</button></td>
+  </tr>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent, computed } from '@nuxtjs/composition-api'
+import { createNamespacedHelpers } from 'vuex-composition-helpers'
 
-import { mapMutations } from 'vuex'
+const { useMutations } = createNamespacedHelpers('cart')
 
-export default Vue.extend({
+export default defineComponent({
   filters: {
-    currency: (value: number) => value.toFixed(2)
+    currency: (value: number) => value.toFixed(2),
   },
   props: {
     id: {
@@ -43,22 +46,24 @@ export default Vue.extend({
   },
   computed: {
     _count: {
-      get() {
-        return (this as any).$props.count
+      get(): number {
+        return this.$props.count
       },
-      set(value) {
-        (this as any).update({
-          ...(this as any).$props,
-          count: Number(value)
+      set(value: string) {
+        this.update({
+          ...this.$props,
+          count: Number(value),
         })
-      }
+      },
     },
   },
-  methods: {
-    ...mapMutations({
-      remove: 'cart/remove',
-      update: 'cart/update'
-    }),
+  setup() {
+    const { remove, update } = useMutations(['remove', 'update'])
+
+    return {
+      remove,
+      update,
+    }
   },
 })
 </script>

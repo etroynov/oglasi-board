@@ -30,59 +30,26 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent } from '@nuxtjs/composition-api'
+
+import { useCategoriesWithProducts } from '../hooks'
+
 import Cart from '../components/Cart.vue'
 import Spoiler from '../components/Spoiler.vue'
 import Product from '../components/Product.vue'
 
-export default Vue.extend({
-  data(): {
-    interval: NodeJS.Timeout
-  } {
-    return {
-      interval: '' as any,
-    }
-  },
-  methods: {
-    start() {
-      this.interval = setInterval(() => {
-        this.$store.dispatch('fetch');
-      }, 3 * 1000)
-    },
-    stop() {
-      clearInterval(this.interval)
-    },
-  },
+export default defineComponent({
   components: {
     Cart,
     Product,
     Spoiler,
   },
-  computed: {
-    categoriesWithProducts() {
-      const categories = this.$store.state.categories.data
-      const products = this.$store.state.products.data
+  setup() {
+    const { categoriesWithProducts } = useCategoriesWithProducts();
 
-      return categories
-        .map((category: any) => {
-          const _products =
-            products.filter((product: any) => {
-              return product.categoryId === category.id
-            }) ?? []
-
-          return {
-            ...category,
-            products: _products,
-          }
-        })
-        .filter((category: any) => category.products.length)
-    },
-  },
-  async mounted() {
-    this.$store.dispatch('fetch').then(this.start)
-  },
-  beforeDestroy() {
-    this.stop()
+    return {
+      categoriesWithProducts
+    }
   },
 })
 </script>

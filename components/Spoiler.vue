@@ -17,25 +17,27 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { ref, defineComponent } from '@nuxtjs/composition-api'
 
-export default Vue.extend({
+export default defineComponent({
   props: {
     title: {
       type: String,
       default: '',
     },
   },
-  data() {
-    return {
-      open: true,
+  setup() {
+    const open = ref(true)
+
+    const toggle = () => {
+      open.value = !open.value
     }
-  },
-  methods: {
-    toggle() {
-      this.open = !this.open
-    },
-  },
+
+    return {
+      open,
+      toggle
+    }
+  }
 })
 </script>
 
