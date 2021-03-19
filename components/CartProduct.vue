@@ -2,7 +2,7 @@
   <tr>
     <td width="300">{{ name }}</td>
     <td width="50">
-      <input v-model="_count" />
+      <input type="number" v-model="_count" />
       <p class="error" v-show="_count>= quantity">
         Количество ограничено
       </p>
